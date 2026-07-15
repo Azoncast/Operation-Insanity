@@ -4,7 +4,7 @@ addLayer("t", {
     position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
     startData() { return {
         unlocked: true,
-		points: new Decimal(0),
+		points: new Decimal(1),
     }},
     color: "#7DF9FF",
     requires: new Decimal(1), // Can be a function that takes requirement increases into account
@@ -28,18 +28,61 @@ addLayer("t", {
     upgrades: {
         11: {
              title: "Signal Amplification",
-            description: "Boosts weak electrical currents. +0.1 operations gain",
+            description: "Boosts weak electrical currents.<br> +0.1 operations gain",
             cost: new Decimal(1),
         },
 
         12: {
              title: "Astable Oscillation",
-            description: "Creates a repeating 0-1-0-1 pulse. x2 operations gain.",
+            description: "Creates a repeating 0-1-0-1 pulse.<br> x2 operations gain.",
             cost: new Decimal(2),
             unlocked() { return hasUpgrade('t', 11) },
         },
 
+        13: {
+             title: "The Bistable Latch",
+            description: "Holds a state without external input.<br> Transistors boost operations.",
+            cost: new Decimal(4),
+            unlocked() { return hasUpgrade('t', 12) },
+            effect() {
+             return player[this.layer].points.add(1).pow(0.5)
+                },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
+        },
+        // player.points refer to points,  player[this.layer].points refers to the prestige
+        14: {
+             title: "Differential Pair",
+            description: "Compares two signals to cancel out static. <br> Operations boost themselves slightly.",
+            cost: new Decimal(8),
+            unlocked() { return hasUpgrade('t', 13) },
+            effect() {
+             return player.points.add(1).log(10).add(1).pow(0.5) // points boosts themselves here. this is the formula for a slight boost
+                },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
+        },
+
     },
+
 
     layerShown(){return true}
 })
+
+addLayer("a", {
+    row: "side",
+    symbol: "🏆", 
+
+    tooltip() { // Optional, tooltip displays when the layer is locked
+        return ("Achievements")
+    },
+
+
+    achievements: {
+    11: {
+            image: "options_wheel.png",
+            name: "Operations Online",
+            done() {return player.points.gt(0.1) }, // This one is a freebie
+            goalTooltip: "Have more than 0.1 operations", // Shows when achievement is not completed
+            doneTooltip: "Beginning of the end?", // Showed when the achievement is completed
+        },              
+}   
+})  

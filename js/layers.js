@@ -5,10 +5,11 @@ addLayer("t", {
     image: "transistor symbol.png",
 
     nodeStyle: {
-        "background-size": "contain", // Makes the whole image fit inside
+        "background-size": "75%",
+        
         "background-repeat": "no-repeat", // Prevents tiling
         "background-position": "center", // Centers the image
-        "background-position": "35% center"
+        "background-position": "40% center"
     },
 
     startData() { return {

@@ -1,5 +1,5 @@
 let modInfo = {
-	name: "Operation Insaity",
+	name: "Operation Insanity",
 	id: "test1",
 	author: "Azon",
 	pointsName: "operations",
@@ -13,14 +13,17 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.1",
+	num: "0.2",
 	name: "The Testing Branch",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
-	<h3>v0.1</h3><br>
+	<br><h3>v0.1</h3><br>
 		- Started development <br>
-		- Having fun.`
+	<br><br><h3>v0.2</h3><br>
+		- Added achievements <br>
+		- Added the log book`
+	
 
 let winText = ` You shouldn't be here yet. `
 
@@ -43,11 +46,12 @@ function getPointGen() {
 		return new Decimal(0)
 
 	let gain = new Decimal(0)
-
-	if (hasUpgrade('t', 11)) gain = gain.add(0.1) 
+	if (hasUpgrade('t', 11)) gain = gain.add(0.1) // additive
+	if (hasUpgrade('t', 31)) gain = gain.add(0.1) // additive
 	if (hasUpgrade('t', 12)) gain = gain.mul(2)
 	if (hasUpgrade('t', 13)) gain = gain = gain.times(upgradeEffect('t', 13))
-	if (hasUpgrade('t', 14)) gain = gain = gain.times(upgradeEffect('t', 14))
+	if (hasUpgrade('t', 21)) gain = gain = gain.times(upgradeEffect('t', 21))
+	if (hasUpgrade('t', 22)) gain = gain.mul(1.5)
 
 	return gain
 	

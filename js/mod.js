@@ -7,7 +7,7 @@ let modInfo = {
 
 	discordName: "",
 	discordLink: "",
-	initialStartPoints: new Decimal (10), // Used for hard resets and new players
+	initialStartPoints: new Decimal (1), // Used for hard resets and new players
 	offlineLimit: 0,  // In hours
 }
 
@@ -22,7 +22,7 @@ let changelog = `<h1>Changelog:</h1><br>
 		- Started development <br>
 		- Added stuff.`
 
-let winText = `Congratulations! You have reached the end and beaten this game, but for now...`
+let winText = ` You shouldn't be here yet. `
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
 // (The ones here are examples, all official functions are already taken care of)
@@ -42,8 +42,13 @@ function getPointGen() {
 	if(!canGenPoints())
 		return new Decimal(0)
 
-	let gain = new Decimal(1)
+	let gain = new Decimal(0)
+
+	if (hasUpgrade('t', 11)) gain = gain.add(0.1) 
+	if (hasUpgrade('t', 12)) gain = gain.mul(2)
+
 	return gain
+	
 }
 
 // You can add non-layer related variables that should to into "player" and be saved here, along with default values

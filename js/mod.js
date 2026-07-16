@@ -46,13 +46,18 @@ function getPointGen() {
 		return new Decimal(0)
 
 	let gain = new Decimal(0)
-	if (hasUpgrade('t', 11)) gain = gain.add(0.1) // additive
-	if (hasUpgrade('t', 31)) gain = gain.add(0.1) // additive
-	if (hasUpgrade('t', 12)) gain = gain.mul(2)
-	if (hasUpgrade('t', 13)) gain = gain.mul(upgradeEffect('t', 13))
-	if (hasUpgrade('t', 21)) gain = gain.mul(upgradeEffect('t', 21))
-	if (hasUpgrade('t', 22)) gain = gain.mul(1.5) 
-	if (hasUpgrade('t', 32)) gain = gain.mul(upgradeEffect('t', 32))
+	 row0Modifier = new Decimal(1)
+	if (hasAchievement('a', 21)) {
+		row0Modifier = new Decimal(1.1)
+	}
+	if (hasUpgrade('t', 11)) gain = gain.add(0.1).mul(row0Modifier) // additive
+	if (hasUpgrade('t', 31)) gain = gain.add(0.1).mul(row0Modifier) // additive
+	if (hasUpgrade('t', 12)) gain = gain.mul(2).mul(row0Modifier)
+	if (hasUpgrade('t', 13)) gain = gain.mul(upgradeEffect('t', 13)).mul(row0Modifier)
+	if (hasUpgrade('t', 21)) gain = gain.mul(upgradeEffect('t', 21)).mul(row0Modifier)
+	if (hasUpgrade('t', 22)) gain = gain.mul(1.5).mul(row0Modifier)
+	if (hasUpgrade('t', 32)) gain = gain.mul(upgradeEffect('t', 32)).mul(row0Modifier)
+	if (hasUpgrade('t', 42)) gain = gain.mul(upgradeEffect('t', 42)).mul(row0Modifier)
 
 	return gain
 	

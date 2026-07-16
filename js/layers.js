@@ -14,17 +14,20 @@ addLayer("t", {
 
     startData() { return {
         unlocked: true,
-		points: new Decimal(150),
-        tickspeed: new Decimal(1)
+		points: new Decimal(1),
     }},
-    //runs every tick
-     update(diff) {
-        if (hasUpgrade('t', 33)) {
-            let potentialGain = getResetGain(this.layer);
-            player[this.layer].points = player[this.layer].points.add(potentialGain.times(0.10).times(diff));
-            //10% gain per second
-        }
-    },
+    passiveGeneration() {
+    let baseGain = 0; // Starts at 0% generation
+    
+    if (hasUpgrade('t', 31)) {
+        baseGain = 0.1; // Upgrade gives 10% (0.1) passive gain per second
+    }
+    if (hasAchievement('a', 21)) {
+            baseGain = baseGain * 1.1; // Boosts it to 11% (0.11) passive gain
+    }
+    
+    return baseGain; // Returns a number between 0 and 1 (where 1 = 100% per second)
+},
 
     color: "#7DF9FF",
     requires: new Decimal(1), // Can be a function that takes requirement increases into account
@@ -32,11 +35,27 @@ addLayer("t", {
     baseResource: "operations", // Name of resource prestige is based on
     baseAmount() {return player.points}, // Get the current amount of baseResource
     type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
-    exponent: 0.5, // Prestige currency exponent
+
+    exponent: function() {
+        let baseExponent = 0.5
+        let row0Modifier = new Decimal(1)
+	    if (hasAchievement('a', 21)) {
+		    row0Modifier = new Decimal(1.1)
+	    }
+        if (hasUpgrade('t', 41)) {
+            baseExponent = new Decimal(0.6).mul(row0Modifier)
+        }
+        return baseExponent
+    }, // Prestige currency exponent
+
     gainMult() { // Calculate the multiplier for main currency from bonuses
-        mult = new Decimal(1)
+        let mult = new Decimal(1)
+        let row0Modifier = new Decimal(1)
+        if (hasAchievement('a', 21)) {
+		    row0Modifier = new Decimal(1.1)
+	    }
         if (hasUpgrade('t', 23)) mult = mult.times(upgradeEffect('t', 23))
-        return mult
+        return mult.mul(row0Modifier)
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
         return new Decimal(1)
@@ -55,7 +74,7 @@ addLayer("t", {
 
         12: {
             title: "Astable Oscillation",
-            description: "Creates a repeating 0-1-0-1 pulse.<br> x2 operations gain.",
+            description: "Creates a repeating 0-1-0-1 pulse wave.<br> x2 operations gain.",
             cost: new Decimal(2),
             unlocked() { return hasUpgrade('t', 11) },
         },
@@ -77,7 +96,7 @@ addLayer("t", {
             cost: new Decimal(8),
             unlocked() { return hasUpgrade('t', 13) },
             effect() {
-             return player.points.add(1).log(10).add(1).pow(0.5) // points boosts themselves here. this is the formula for a slight boost
+             return player.points.add(1).log(10).add(1).pow(0.5) // formula used to boost themselves
                 },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
         },
@@ -89,7 +108,7 @@ addLayer("t", {
         },
          23: {
             title: "Signal Multiplexing",
-            description: "Routes many pulses into a single coherent path.<br>Operation gain is increased by the amounts of upgrade bought.",
+            description: "Routes many pulses into a single coherent path.<br>Operation gain is increased by upgrades bought.",
             cost: new Decimal(32),
             unlocked() { return hasUpgrade('t', 22) },
             effect() {
@@ -126,17 +145,85 @@ addLayer("t", {
             },
             effectDisplay() { return format(this.effect())+"x" },
         },
-            33: {
+        33: {
             title: "The Redundancy Bridge",
             description: "Uses spare paths to bypass errors. <br> Gain 10% of transistors per second.",
             cost: new Decimal(256),
             unlocked() { return hasUpgrade('t', 32) },
+        },
+        41: {
+            title: "Threshold Comparison",
+            description: "Decides strictly whether or not a signal is a '1' or a '0' <br> Lowers the costs of each transistors.",
+            cost: new Decimal(516),
+            unlocked() { return hasUpgrade('t', 33) },
+        },
+        42: {
+            title: "The Logic Gateway",
+            description: "Finalizes the Signal Array to interface with logic gates. <br> Transistors boost themselves significantly.",
+            cost: new Decimal(1024),
+            unlocked() { return hasUpgrade('t', 41) },
+            effect() {
+                return player[this.layer].points.add(1).log10().add(1).pow(2.5) // formula used to boost themselves
+                },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
         },
     },
 
 
 
     layerShown(){return true}
+})
+
+addLayer("nand", { 
+    name: "nand", 
+    symbol: "N", 
+    row: 1, 
+    position: 0, 
+    color: "#ec3838",
+    
+    // Resource settings
+    resource: "nand gates", 
+    baseResource: "transistors", // It consumes your row 0 resource
+    baseAmount() { return player.t.points }, 
+    startData() { return {
+        unlocked: false,
+        revealed: false,
+        points: new Decimal(0),
+    }},
+    requires: new Decimal(1e5), // Amount of row 0 points needed to prestige
+    type: "normal", 
+    exponent: 0.5, 
+
+    gainMult() { // Calculate the multiplier for main currency from bonuses
+        mult = new Decimal(1)
+        return mult
+    },
+    gainExp() { // Calculate the exponent on main currency from bonuses
+        return new Decimal(1)
+    },
+
+    // 2. Branching Visual Connection
+    branches: ["t"], // Draws a line coming UP from the 'p' layer on row 0
+
+    //runs every frame
+    update(diff) {
+         //checks every frame if this layer is unblocked
+        if (player.t.points.gte(100)) {
+            player[this.layer].revealed = true;
+        }
+    },
+
+    layerShown() { 
+        return player[this.layer].revealed
+    },
+
+    upgrades: {
+        11: {
+            title: "NAND Gate",
+            description: "test",
+            cost: new Decimal(1),
+        }
+    }
 })
 
 addLayer("a", {
@@ -154,7 +241,7 @@ addLayer("a", {
             name: "Operations Online",
             done() {return hasUpgrade('t', 11) }, // This one is a freebie
             goalTooltip: "Connect your first transistor", // Shows when achievement is not completed
-            doneTooltip: "Beginning of the end?", // Showed when the achievement is completed
+            doneTooltip: "The beginning of the end?", // Showed when the achievement is completed
         },   
         
     12: {
@@ -185,6 +272,42 @@ addLayer("a", {
             goalTooltip: "Build the Redundancy Bridge component", // Shows when achievement is not completed
             doneTooltip: "Ghost in the machine", // Showed when the achievement is completed
         }, 
+    16: {
+            image: "options_wheel.png",
+            name: "Digitization",
+            done() {return hasUpgrade('t', 41)}, // see if point gen per second is above 60
+            goalTooltip: "Build the Threshold Comparator", // Shows when achievement is not completed
+            doneTooltip: "Binary star", // Showed when the achievement is completed
+        },
+    21: {
+            image: "",
+            name: "Probabilistic Signal Array",
+            done() {
+                upgrades = [11,12,13,21,22,23,31,32,33,41,42]
+                return upgrades.every(id => hasUpgrade('t', id))
+            },
+            goalTooltip: "Build all of the components of the array.", // Shows when achievement is not completed
+            doneTooltip: "It's a lot of refined sand and copper just to make a pulse, isn't it? <br> <h6>All row 0 upgrades are 10% stronger<h/6>", // Showed when the achievement is completed
+            effectDescription() {
+            return "All transistor upgrades are 1.1x stronger."
+            },
+            textStyle() {
+                return {
+                    color: "#FFD700", 
+                } 
+            },
+            style() {
+                return {
+                "padding": "5px",
+                "display": "flex",
+                "justify-content": "center",
+                "align-items": "center",
+                "background-color": "#222222",
+                "border-color": "#FFD700"
+            }
+            },
+            
+        },
 }   
 })  
 
@@ -201,6 +324,9 @@ addLayer("story", {
         "Logs": {
             content: [
                 ["display-text", function() { 
+                    return "<h1> ================= <br> THE SIGNAL ARRAY <br> ================= </h1> <br><br>"
+                }],
+                ["display-text", function() { 
                     if (hasUpgrade('t', 11)) return "<h2> AMPLIFIER </h2><br> I’ve integrated my first semiconductor, the base unit of the entire system. <br> By channeling current through this junction, I can take a whisper of electricity and amplify it into a usable signal. <br> It is a humble beginning, but the machine has finally found its voice.<br>"
                     return 
                 }],
@@ -209,7 +335,7 @@ addLayer("story", {
                     return 
                 }],
                 ["display-text", function() { 
-                    if (hasUpgrade('t', 13)) return "<br><h2> THE BISTABLE LATCH </h2><br> I’ve arranged four transistors into a cross-coupled feedback loop that can hold a specific state indefinitely. <br> This 'latch' represents the birth of memory, allowing the system to store information even after the initial signal has passed. <br> The machine no longer just processes; it remembers.<br>"
+                    if (hasUpgrade('t', 13)) return "<br><h2>  BISTABLE LATCH </h2><br> I’ve arranged four transistors into a cross-coupled feedback loop that can hold a specific state indefinitely. <br> This 'latch' represents the birth of memory, allowing the system to store information even after the initial signal has passed. <br> The machine no longer just processes; it remembers.<br>"
                     return 
                 }],
                 ["display-text", function() { 
@@ -234,6 +360,14 @@ addLayer("story", {
                 }],
                 ["display-text", function() { 
                     if (hasUpgrade('t', 33)) return "<br><h2> REDUNDANCY BRIDGE </h2><br> With hundreds of components, physical failure is now a statistical certainty. <br>I’ve built a self-healing bridge that automatically reroutes signals around dead or faulty transistors. <br>The machine is now resilient enough to maintain its own existence without my constant intervention.<br>"
+                    return 
+                }],
+                ["display-text", function() { 
+                    if (hasUpgrade('t', 41)) return "<br><h2> THRESHOLD COMPARATOR </h2><br> I am no longer looking at the subtle 'height' of the electrical waves, but their simple presence or absence. <br>By comparing signals against a fixed voltage, I’ve forced the chaotic analog world into sharp, digital spikes. <br>This is the birth of the bit; the ambiguity of electricity is dying. <br>"
+                    return 
+                }],
+                ["display-text", function() { 
+                    if (hasUpgrade('t', 42)) return "<br><h2> THE LOGIC GATEWAY </h2><br>The density of the array has reached a critical mass where physical switches have become abstract possibilities. I have prepared a gateway that stands ready to interpret these trillions of pulses as something more than just movement. <br>The hardware is complete; the machine is ready to move onto the next phase of development..<br>"
                     return 
                 }],
             ]

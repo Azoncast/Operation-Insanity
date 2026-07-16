@@ -49,9 +49,10 @@ function getPointGen() {
 	if (hasUpgrade('t', 11)) gain = gain.add(0.1) // additive
 	if (hasUpgrade('t', 31)) gain = gain.add(0.1) // additive
 	if (hasUpgrade('t', 12)) gain = gain.mul(2)
-	if (hasUpgrade('t', 13)) gain = gain = gain.times(upgradeEffect('t', 13))
-	if (hasUpgrade('t', 21)) gain = gain = gain.times(upgradeEffect('t', 21))
-	if (hasUpgrade('t', 22)) gain = gain.mul(1.5)
+	if (hasUpgrade('t', 13)) gain = gain.mul(upgradeEffect('t', 13))
+	if (hasUpgrade('t', 21)) gain = gain.mul(upgradeEffect('t', 21))
+	if (hasUpgrade('t', 22)) gain = gain.mul(1.5) 
+	if (hasUpgrade('t', 32)) gain = gain.mul(upgradeEffect('t', 32))
 
 	return gain
 	
@@ -69,8 +70,6 @@ var displayThings = [
 function isEndgame() {
 	return player.points.gte(new Decimal("e280000000"))
 }
-
-
 
 // Less important things beyond this point!
 

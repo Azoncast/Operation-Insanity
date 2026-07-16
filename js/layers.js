@@ -14,8 +14,18 @@ addLayer("t", {
 
     startData() { return {
         unlocked: true,
-		points: new Decimal(50),
+		points: new Decimal(150),
+        tickspeed: new Decimal(1)
     }},
+    //runs every tick
+     update(diff) {
+        if (hasUpgrade('t', 33)) {
+            let potentialGain = getResetGain(this.layer);
+            player[this.layer].points = player[this.layer].points.add(potentialGain.times(0.10).times(diff));
+            //10% gain per second
+        }
+    },
+
     color: "#7DF9FF",
     requires: new Decimal(1), // Can be a function that takes requirement increases into account
     resource: "transistors", // Name of prestige currency
@@ -38,20 +48,20 @@ addLayer("t", {
 
     upgrades: {
         11: {
-             title: "Signal Amplification",
+            title: "Signal Amplification",
             description: "Boosts weak electrical currents.<br> +0.1 operations gain",
             cost: new Decimal(1),
         },
 
         12: {
-             title: "Astable Oscillation",
+            title: "Astable Oscillation",
             description: "Creates a repeating 0-1-0-1 pulse.<br> x2 operations gain.",
             cost: new Decimal(2),
             unlocked() { return hasUpgrade('t', 11) },
         },
 
         13: {
-             title: "The Bistable Latch",
+            title: "The Bistable Latch",
             description: "Holds a state without external input.<br> Transistors boost operations.",
             cost: new Decimal(4),
             unlocked() { return hasUpgrade('t', 12) },
@@ -62,7 +72,7 @@ addLayer("t", {
         },
         // player.points refer to points,  player[this.layer].points refers to the prestige
         21: {
-             title: "Differential Pairing",
+            title: "Differential Pairing",
             description: "Compares two signals to cancel out static. <br> Operations boost themselves slightly.",
             cost: new Decimal(8),
             unlocked() { return hasUpgrade('t', 13) },
@@ -72,13 +82,13 @@ addLayer("t", {
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
         },
          22: {
-             title: "Operational Junctions",
-            description: "Allows signals to merge or split<br>Operation gain is increased by 50%",
+            title: "Operational Junctions",
+            description: "Allows signals to merge or split.<br>Operation gain is increased by 50%",
             cost: new Decimal(16),
             unlocked() { return hasUpgrade('t', 21) },
         },
          23: {
-             title: "Signal Multiplexing",
+            title: "Signal Multiplexing",
             description: "Routes many pulses into a single coherent path.<br>Operation gain is increased by the amounts of upgrade bought.",
             cost: new Decimal(32),
             unlocked() { return hasUpgrade('t', 22) },
@@ -89,13 +99,41 @@ addLayer("t", {
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
         },
         31: {
-             title: "Voltage Regulation",
+            title: "Voltage Regulation",
             description: "Keeps power levels perfectly flat. <br> Adds +0.1 gain to operations per second.",
             cost: new Decimal(64),
             unlocked() { return hasUpgrade('t', 23) },
         },
-
+        32: {
+            title: "Frequency Synthesization",
+            description: "Aligns all pulses to a master clock. <br> Subsequent upgrades will increase operation speed by 30%",
+            cost: new Decimal(128),
+            unlocked() { return hasUpgrade('t', 31) },
+            effect() {
+                count = 0
+            
+                if (hasUpgrade('t', 32)) 
+                    count++;
+                if (hasUpgrade('t', 33)) 
+                    count++;
+                if (hasUpgrade('t', 41)) 
+                    count++;
+                if (hasUpgrade('t', 42)) 
+                    count++;
+                if (hasUpgrade('t', 43)) 
+                    count++;
+                return new Decimal(1).add(count * 0.3)
+            },
+            effectDisplay() { return format(this.effect())+"x" },
+        },
+            33: {
+            title: "The Redundancy Bridge",
+            description: "Uses spare paths to bypass errors. <br> Gain 10% of transistors per second.",
+            cost: new Decimal(256),
+            unlocked() { return hasUpgrade('t', 32) },
+        },
     },
+
 
 
     layerShown(){return true}
@@ -121,11 +159,32 @@ addLayer("a", {
         
     12: {
             image: "options_wheel.png",
-            name: "Daisy Chaining",
-            done() {return hasUpgrade('t', 12) }, // This one is a freebie
-            goalTooltip: "Have two transistors work with each other", // Shows when achievement is not completed
-            doneTooltip: "Two is better than one!", // Showed when the achievement is completed
-        },  
+            name: "Static State",
+            done() {return hasUpgrade('t', 13) }, 
+            goalTooltip: "Build the Bistable Latch component", // Shows when achievement is not completed
+            doneTooltip: "I am because I remember", // Showed when the achievement is completed
+        }, 
+    13: {
+            image: "options_wheel.png",
+            name: "Analogue Calculation",
+            done() {return hasUpgrade('t', 22) }, 
+            goalTooltip: "Build the Operational Junction component", // Shows when achievement is not completed
+            doneTooltip: "Close enough", // Showed when the achievement is completed
+        },   
+    14: {
+            image: "options_wheel.png",
+            name: "60 Hz",
+            done() {return tmp.pointGen.gte(60)}, // see if point gen per second is above 60
+            goalTooltip: "Reach 60 op/s or more", // Shows when achievement is not completed
+            doneTooltip: "It hums", // Showed when the achievement is completed
+        }, 
+    15: {
+            image: "options_wheel.png",
+            name: "Positive Feedback",
+            done() {return hasUpgrade('t', 33)}, // see if point gen per second is above 60
+            goalTooltip: "Build the Redundancy Bridge component", // Shows when achievement is not completed
+            doneTooltip: "Ghost in the machine", // Showed when the achievement is completed
+        }, 
 }   
 })  
 
@@ -167,6 +226,14 @@ addLayer("story", {
                 }],
                 ["display-text", function() { 
                     if (hasUpgrade('t', 31)) return "<br><h2> VOLTAGE REGULATOR </h2><br>As the transistor count grows, the electrical surges are becoming violent enough to melt the substrate. <br>This array acts as a dam, smoothing out chaotic spikes into a perfectly flat, predictable current. <br>Stability is the precursor to speed; I can now push the system harder without it collapsing. <br>"
+                    return 
+                }],
+                ["display-text", function() { 
+                    if (hasUpgrade('t', 32)) return "<br><h2> FREQUENCY SYNTHESIZER </h2><br>I’ve established a master clock that forces every individual component to fire in perfect unison. <br> By synthesizing a single frequency, the entire array pulses as a single, synchronized organism rather than a collection of parts. <br> Precision is no longer a goal; it is a requirement. <br>"
+                    return 
+                }],
+                ["display-text", function() { 
+                    if (hasUpgrade('t', 33)) return "<br><h2> REDUNDANCY BRIDGE </h2><br> With hundreds of components, physical failure is now a statistical certainty. <br>I’ve built a self-healing bridge that automatically reroutes signals around dead or faulty transistors. <br>The machine is now resilient enough to maintain its own existence without my constant intervention.<br>"
                     return 
                 }],
             ]

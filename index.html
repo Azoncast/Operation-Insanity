@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <head>
-
+	
 	<link rel="stylesheet" type="text/css" href="css/system-style.css" />
 	<link rel="stylesheet" type="text/css" href="css/bars.css" />
 	<link rel="stylesheet" type="text/css" href="css/components.css" />
@@ -34,12 +34,23 @@
 	<script src="js/utils/options.js"></script>
 	<script src="js/utils/save.js"></script>
 	<script src="js/utils/themes.js"></script>
+	<!-- news ticker style-->
+	<style>
+
+	</style>
 
 </head>
 
 
 <body onload="load()" onmousemove="updateMouse(event)">
 	<div id="app">
+
+		<!-- news ticker -->
+		<div id="news-ticker" v-if="modInfo.showTicker" class="ticker-container">
+    	<div class="ticker-content" :style="{ animationDuration: modInfo.tickerSpeed + 's' }">
+        <span v-for="news in modInfo.tickerMessages" class="ticker-item">{{ news }}</span>
+ 		</div>
+		</div>
 		<canvas id="treeCanvas" class="canvas" v-if="!(tmp.gameEnded && !player.keepGoing)"></canvas>
 
 		<div v-if="false" id="loadingSection" class="fullWidth">

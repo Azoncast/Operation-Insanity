@@ -320,10 +320,10 @@ addLayer("story", {
     },
 
     tabFormat: {
-
         "Logs": {
             content: [
                 ["display-text", function() { 
+                    if (hasUpgrade('t', 11))
                     return "<h1> ================= <br> THE SIGNAL ARRAY <br> ================= </h1> <br><br>"
                 }],
                 ["display-text", function() { 
@@ -370,9 +370,18 @@ addLayer("story", {
                     if (hasUpgrade('t', 42)) return "<br><h2> THE LOGIC GATEWAY </h2><br>The density of the array has reached a critical mass where physical switches have become abstract possibilities. I have prepared a gateway that stands ready to interpret these trillions of pulses as something more than just movement. <br>The hardware is complete; the machine is ready to move onto the next phase of development..<br>"
                     return 
                 }],
+                
             ]
         }
 
-    }
-
+    }   
 })
+
+//add this to any achievements to trigger the news segment changing
+//            onComplete() {
+//               modInfo.tickerMessages = shuffleArray([
+//                "test1",
+//                  "test2",
+//              ])
+//
+//          }

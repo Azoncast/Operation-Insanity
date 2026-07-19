@@ -229,11 +229,14 @@ addLayer("nand", {
 addLayer("a", {
     row: "side",
     symbol: "🏆", 
-
+    position: 1,
+    
     tooltip() { // Optional, tooltip displays when the layer is locked
         return ("Achievements")
     },
 
+    
+    
 
     achievements: {
     11: {
@@ -306,19 +309,50 @@ addLayer("a", {
                 "border-color": "#FFD700"
             }
             },
+            onComplete() {
+                modInfo.tickerMessages = shuffleArray([
+                "L0/al ci#y cou=ncil meeti#ng adjo#urned ear#y d/ue to a malfu#nctioning thermo#stat.",
+                "Gl0b@l wh#eat exp#orts re#ach a fi/ve-year h!gh; br=ead pri#ces expe#cted to rem/ain sta#ble.",
+                "N#w stu#y sugg#sts th#t dri/king thr#e cu=ps of t#a a d@y m#y impr#ve gen#ral fo/us.",
+                "Int#rn@ti#n@l sp@ce st@ti#n cr#w succ#ssfu#y r#pl@c#s a f@u#ty #xt#rn@l l!ght bu#b.",
+                "T#ch g!@nt @nnounc#s n#w sm@rtph#n# w!th a sl!ght#y m#r# r#und#d corn#r; cr!t!cs und#rw#@lm#d.",
+                "W#rld's #ld#st t#rt#!s# c#l#br@t#s 191st b!rthd@y !n a r#m#t# !sl@nd s@nctu@ry.",
+                "@rch@#@l#g!sts !n #gypt f!nd @n#th#r s#t of j@rs; 'Th#y @r# d#f!n!t#ly just m#r# j@rs,' s@ys l#@d r#s#@rch#r.",
+                "St#ck m@rk#t r#m@!ns m#st#y fl@t @s !nv#st#rs w@!t f#r a r#@#n t# buy #r s#ll.",
+                "P#pul@r str#@m!ng s#rv!c# @nnounc#s pl@ns t# cr@ck d#wn #n p@ssw#rd sh@r!ng n#xt f!sc@l qu@rt#r.",
+                "M#t#@r#l#g!c@l d#p@rtm#nt w@rns #f a d!st!nct#y @v#r@g# r@!ny s#@s#n f#r th# tr!-st@t# @r#@.",
+                "Pr#f#ss!#n@l @thl#t# s!gns a r#c#rd-br#@k!ng c#ntr@ct; f@ns d#b@t# !f h€ !s @ctu@#ly w#rth th# m#n#y.",
+                "R@r# b!rd sp#c!#s sp#tt#d !n a l#c@l b@cky@rd f#r th# f!rst t!m# !n #v#r th!rty y#@rs.",
+                "F!lm cr!t!cs c@ll th# l@t#st summ€r bl#ckbust#r 'v!su@#ly stunn!ng but #m#t!#n@#ly h#ll#w.' ",
+                "Sc!#nt!sts succ#ssfu#ly t#@ch a p@rr#t t# r#c#gn!z# b@s!c g#@m#tr!c sh@p#s w!th 60% @ccur@cy.",
+                "L#c@l l!br@ry r#p#rts a 2% !ncr#@s# !n b#ok ch#ck#uts; '!t !s a m#d#st v!ct#ry,' s@ys h#@d l!br@r!@n.",
+                "@str#n#m#rs d!sc#v#r a n#w #x#pl@n#t th@t @lm#st c#rt@!nly c@nn#t supp#rt l!f# #f @ny k!nd.",
+                "Study f!nds th@t 100% #f p#@pl# wh# dr!nk w@t#r #v#ntu@lly d#v#l#p @n #p!n!#n #n !ts t#mp#r@tur#.",
+                "Gl#b@l c#ff## r#s#rv#s r#@ch '@d#qu@t#' l#v#ls; pr#duct!v!ty #xp#ct#d t# st@y #x@ctly wh#r# !t !s.",
+                "R#g!#n@l h!ghw@y c#nstruct!#n f!n!sh#d thr## d@ys #@rly; c#mmut#rs r#p#rt f##l!ng 'm!ldly surpr!s#d.'",
+                "Sm@ll t#wn w!ns w#rld r#c#rd f#r th# l@rg#st c#ll#ct!#n #f v!nt@g€ c#r@m!c th!mbl#s.",
+                ])
+            }
             
         },
 }   
 })  
 
+addLayer("blank1", {
+    row: "side",
+    position: 2,
+    layerShown(){
+        return "ghost"
+    }
+})
+
 addLayer("story", {
     row: "side",
     symbol: "📑",
-
       tooltip() { // Optional, tooltip displays when the layer is locked
         return ("Logbook")
     },
-
+    position: 3,
     tabFormat: {
         "Logs": {
             content: [
@@ -377,11 +411,3 @@ addLayer("story", {
     }   
 })
 
-//add this to any achievements to trigger the news segment changing
-//            onComplete() {
-//               modInfo.tickerMessages = shuffleArray([
-//                "test1",
-//                  "test2",
-//              ])
-//
-//          }
